@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#1652d4">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>视频详情 · 教师编刷题系统</title>
+<style>
+:root{
+  --bg:#f4f7fc;--surface:#fff;--surface-2:#f8faff;--ink:#16233a;--ink-2:#3c4a63;--muted:#7a889f;
+  --line:#e6ecf5;--line-2:#d7e0ee;--brand:#1652d4;--brand-deep:#0f3fa8;--brand-soft:#eaf1ff;--brand-line:#cfe0ff;
+  --ok:#0e9f6e;--ok-soft:#e6f7f0;--gold-soft:#fff5e2;--shadow-1:0 1px 3px rgba(16,36,71,.04),0 1px 2px rgba(16,36,71,.03);
+  --shadow-2:0 8px 26px rgba(16,36,71,.1);--r-md:14px;--r-lg:20px;--ease:cubic-bezier(.16,1,.3,1);
+  --font:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
+.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.nav .back{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);font-size:18px}
+.nav .nb{font-size:14px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav .share{background:var(--brand-soft);color:var(--brand);border:1px solid var(--brand-line);border-radius:10px;padding:8px 13px;font-size:12px;font-weight:700;cursor:pointer}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 140px}
+.hero-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r-lg);background:#eef2f8;box-shadow:var(--shadow-2);display:block}
+.v-title{font-size:19px;font-weight:800;line-height:1.5;margin:18px 2px 8px}
+.v-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:16px}
+.v-meta .up{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:4px 10px;border-radius:7px}
+.v-meta .vf{background:var(--ok-soft);color:var(--ok);font-weight:700;padding:4px 10px;border-radius:7px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;margin-bottom:14px;box-shadow:var(--shadow-1)}
+.card h3{font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h3 .bar{width:4px;height:17px;background:var(--brand);border-radius:3px}
+.v-desc{font-size:13.5px;color:var(--ink-2);line-height:1.9}
+.kp-tags{display:flex;flex-wrap:wrap;gap:8px}
+.kp-tags .kt{background:var(--brand-soft);color:var(--brand);font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px}
+.kp-tags .kt.ls{background:var(--ok-soft);color:var(--ok)}
+.kp-list{display:flex;flex-direction:column;gap:10px}
+.kp-block{background:var(--surface-2);border-radius:12px;padding:13px 15px}
+.kp-block .kh{font-size:13px;font-weight:800;color:var(--brand);margin-bottom:6px}
+.kp-block .kc{font-size:12.5px;color:var(--ink-2);line-height:1.85}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gallery img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;cursor:pointer;border:1px solid var(--line);transition:.2s}
+.gallery img:hover{transform:scale(1.02);box-shadow:var(--shadow-2)}
+.src-note{font-size:11.5px;color:var(--muted);line-height:1.8;margin-top:10px}
+.src-note a{color:var(--brand);text-decoration:none}
+.enter-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:30;box-shadow:0 -4px 20px rgba(20,45,100,.06)}
+.enter-btn{width:100%;max-width:688px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--brand-deep),var(--brand));color:#fff;border:none;border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 22px rgba(22,82,212,.3);transition:.18s}
+.enter-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(22,82,212,.4)}
+.enter-btn:active{transform:scale(.98)}
+.enter-btn .arrow{font-size:20px}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(10,20,40,.92);z-index:100;align-items:center;justify-content:center;padding:20px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:12px}
+.lightbox .close{position:absolute;top:20px;right:20px;color:#fff;font-size:30px;cursor:pointer;background:rgba(255,255,255,.15);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="nav">
+  <div class="back" onclick="vpBack()">‹</div>
+  <div class="nb" id="navTitle">视频详情</div>
+  <div class="share" id="shareBtn">🔗 分享</div>
+</div>
+<div class="wrap" id="wrap">
+  <img class="hero-img" id="heroImg" alt="视频封面">
+  <div class="v-title" id="vTitle">—</div>
+  <div class="v-meta"><span class="up" id="vAuthor">—</span><span class="vf" id="vVerify">✓ 来源核验</span><span class="vf" id="vPlatform" style="background:var(--brand-soft);color:var(--brand)">平台</span><span id="vSubject">—</span></div>
+
+  <div class="card">
+    <h3><span class="bar"></span>视频简介</h3>
+    <div class="v-desc" id="vDesc">—</div>
+  </div>
+
+  <div class="card">
+    <h3><span class="bar"></span>关联知识点</h3>
+    <div class="kp-tags" id="kpTags"></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="bar"></span>知识点总结</h3>
+    <div class="kp-list" id="kpSummary"></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="bar"></span>图片预览</h3>
+    <div class="gallery" id="gallery"></div>
+    <div class="src-note">封面图已下载到本地保存，点击可放大查看。原始来源：<a id="srcLink" href="#" target="_blank" rel="noopener">课程页 ↗</a></div>
+  </div>
+</div>
+<div class="enter-bar"><button class="enter-btn" id="enterBtn">▶ 进入视频 <span class="arrow">↗</span></button></div>
+<div class="lightbox" id="lightbox"><span class="close" onclick="closeLight()">×</span><img id="lightImg" alt="预览"></div>
+<div class="toast" id="toast"></div>
+
+<script src="video-data.js"></script>
+<script src="points-data.js"></script>
+<script src="hist-points-data.js"></script>
+<script>
+const VIDEOS=(window.VIDEO_DATA||[]);
+const $=id=>document.getElementById(id);
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function vpBack(){
+  // 有站内历史则退回（回到内嵌视频页，不重载index，不弹欢迎页）；否则跳回视频Tab
+  try{
+    if(history.length>1){history.back();return;}
+  }catch(e){}
+  location.href='index.html?p=video'+location.search.replace(/^\?/,'&');
+}
+// 取 URL 里的 i 参数
+function getIndex(){
+  const m=location.search.match(/[?&]i=(\d+)/);
+  return m?parseInt(m[1]):0;
+}
+// 从考点数据里找知识点总结（真实数据：POINTS_DATA / HIST_POINTS_DATA）
+function stripHtml(s){return String(s==null?'':s).replace(/<[^>]+>/g,'').replace(/&[a-z]+;/g,'');}
+function pointText(b){
+  let parts=[];
+  (b.lines||[]).forEach(ln=>{
+    const h=stripHtml(ln.h||ln.t||'').trim();
+    if(h&&!/^[（(][一二三四五六七八九十][)）]/.test(h))parts.push(h);
+  });
+  (b.tips||[]).forEach(tp=>{
+    const s=stripHtml(tp.l1||tp.t||'').trim();if(s)parts.push(s);
+  });
+  return parts;
+}
+function findKpContent(kpName){
+  const raw=String(kpName||'').replace(/（第.*?周）/,'');
+  // 拆关键词：按 · 、/ 分割，取较长的中文片段做匹配
+  const segs=raw.split(/[·、\/]/).map(s=>s.trim()).filter(s=>s.length>=2);
+  const keys=segs.length?segs:[raw];
+  const sources=[window.POINTS_DATA,window.HIST_POINTS_DATA];
+  let fallback='';
+  for(const src of sources){
+    if(!src||!Array.isArray(src.chapters))continue;
+    for(const ch of src.chapters){
+      const chTitle=String(ch.title||'');
+      const chMatch=keys.some(k=>chTitle.includes(k)||k.includes(chTitle));
+      for(const b of (ch.blocks||[])){
+        const nm=String(b.title||'');
+        const bMatch=keys.some(k=>nm.includes(k)||k.includes(nm));
+        if(b.type==='point'&&(bMatch||chMatch)){
+          const parts=pointText(b);
+          if(bMatch&&parts.length)return parts.slice(0,10).join('。');
+          if(parts.length&&!fallback)fallback=parts.slice(0,6).join('。');
+        }
+      }
+    }
+  }
+  return fallback;
+}
+function render(){
+  const v=VIDEOS[getIndex()];
+  if(!v){$('vTitle').textContent='视频不存在';return;}
+  document.title=v.title+' · 教师编刷题系统';
+  $('navTitle').textContent='视频详情';
+  $('heroImg').src=v.cover;
+  $('vTitle').textContent=v.title;
+  const plat=v.platform||'B站', ptype=v.ptype||'视频';
+  $('vAuthor').textContent=(plat==='B站'?'UP ':'主讲 ')+v.author;
+  $('vPlatform').textContent=plat;
+  $('vVerify').textContent=plat==='B站'?'✓ 官方API校验':'✓ 来源已核验';
+  $('vSubject').textContent=v.subject==='历史'?'📜 历史学科':'📘 教育综合';
+  $('vDesc').textContent=v.desc;
+  $('kpTags').innerHTML=v.kps.map(k=>'<span class="kt'+(v.subject==='历史'?' ls':'')+'">'+esc(k)+'</span>').join('');
+  // 知识点总结：优先真实考点数据，缺失则用视频简介里的要点
+  $('kpSummary').innerHTML=v.kps.map(k=>{
+    const c=findKpContent(k);
+    const content=c?esc(String(c).slice(0,600)):esc(v.desc);
+    return '<div class="kp-block"><div class="kh">📖 '+esc(k)+'</div><div class="kc">'+content+'</div></div>';
+  }).join('');
+  // 图片预览：封面 + 关联视频封面
+  const imgs=[v.cover];
+  VIDEOS.filter(x=>x.bv!==v.bv&&x.kps.some(k=>v.kps.includes(k))).slice(0,5).forEach(x=>imgs.push(x.cover));
+  $('gallery').innerHTML=imgs.map((src,i)=>'<img src="'+esc(src)+'" alt="预览'+(i+1)+'" onclick="openLight(this.src)">').join('');
+  $('srcLink').href=v.url;
+  $('srcLink').textContent=plat+' 课程页 ↗';
+  const enterTxt=ptype==='慕课'?'进入慕课':(ptype==='微课'?'进入微课':'进入视频');
+  $('enterBtn').innerHTML='▶ '+enterTxt+' <span class="arrow">↗</span>';
+  $('enterBtn').onclick=()=>window.open(v.url,'_blank','noopener');
+  $('shareBtn').onclick=async()=>{
+    const url=location.href;
+    try{await navigator.clipboard.writeText(url);toast('链接已复制');}
+    catch(e){toast('复制失败，请手动复制地址栏');}
+  };
+}
+function openLight(src){$('lightImg').src=src;$('lightbox').classList.add('show');}
+function closeLight(){$('lightbox').classList.remove('show');}
+$('lightbox').onclick=e=>{if(e.target===$('lightbox'))closeLight();};
+render();
+</script>
+</body>
+</html>
